@@ -1,11 +1,11 @@
 #!/bin/bash
-# ver 0.6
+# ver 0.7
 
 #
 # Run this file with specifying domain in first parameter:
-#     create-cert.sh my-domain.com
+#     ./create-cert.sh my-domain.com
 # Or simply (the domain will be asked to be entered into console):
-#     create-cert.sh
+#     ./create-cert.sh
 
 # not empty
 if [ -n "$1" ];
@@ -30,12 +30,13 @@ THEDIR=$( dirname "$0" )
 RCDIR="$THEDIR/ROOT_CA_CERT"
 RCNAME="myRootCA"
 
+# skip if root ca already exists
 if [ ! -d "$RCDIR" ]; then
 	mkdir "$RCDIR"
 	openssl genrsa -out "$RCDIR/$RCNAME.key" 2048 #skip encrypt e.g. -des3 to not add pass phrase
 	# generate a root certificate
 	openssl req -x509 -new -nodes -key "$RCDIR/$RCNAME.key" -sha256 -days 7600 -out "$RCDIR/$RCNAME.pem" -subj "$SUBJ/CN=LocalCustomRootCA"
-	# convert pem to crt (it may be useful)
+	# convert pem to crt (this file may come in handy)
 	openssl x509 -inform PEM -outform DER -in "$RCDIR/$RCNAME.pem" -out "$RCDIR/$RCNAME.crt"
 fi
 
