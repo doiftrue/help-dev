@@ -9,17 +9,17 @@ Additionally, for the first run base ROOT CA certificate will be created as well
 
 	$ sudo apt-get install -y ca-certificates
 	$ sudo cp local-ca.crt /usr/local/share/ca-certificates
-	OR
+	$ sudo update-ca-certificates
+
+OR using interactive variant and another ubuntu CA repository (this is not recomended):
+
 	$ sudo cp local-ca.crt /usr/share/ca-certificates/
 	$ sudo dpkg-reconfigure ca-certificates
-
-To do this non-interactively, run:
-
-	sudo update-ca-certificates
 
 See: https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/
 See: https://askubuntu.com/questions/73287/how-do-i-install-a-root-certificate
 See: https://support.kerioconnect.gfi.com/hc/en-us/articles/360015200119-Adding-Trusted-Root-Certificates-to-the-Server
+
 
 ### Add a trusted CA certificate to Chrome and Firefox
 
@@ -29,6 +29,12 @@ See: https://support.securly.com/hc/en-us/articles/206081828-How-do-I-manually-i
 
 ### Notes
 
-View sert:
+update-ca-certificates manual: http://manpages.ubuntu.com/manpages/trusty/man8/update-ca-certificates.8.html
+
+Fresh updates. Remove symlinks in `/etc/ssl/certs` directory.
+
+	sudo update-ca-certificates --fresh
+
+View single certificate data:
 
 	openssl x509 -in certificate.crt -text
