@@ -1,5 +1,5 @@
 #!/bin/bash
-# ver 0.5
+# ver 0.6
 
 #
 # Run this file with specifying domain in first parameter:
@@ -28,7 +28,7 @@ THEDIR=$( dirname "$0" )
 ### Create ROOT CA certificate
 
 RCDIR="$THEDIR/ROOT_CA_CERT"
-RCNAME="myRootCA-$( date '+%Y-%m-%d' )"
+RCNAME="myRootCA"
 
 if [ ! -d "$RCDIR" ]; then
 	mkdir "$RCDIR"
