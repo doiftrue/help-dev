@@ -32,4 +32,4 @@ wp search-replace $DOM $LOCAL_DOM
 rm dump.sql
 
 # copy uploads from remote
-rsync -avzhe ssh beget:homyachishka.ru/public_html/wp-content/uploads wp-content
+rsync -avzhe ssh beget:$REMOTE_DIR/wp-content/uploads wp-content
