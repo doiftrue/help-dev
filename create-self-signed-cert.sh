@@ -1,5 +1,5 @@
 #!/bin/bash
-# ver 0.7
+# ver 0.8
 
 #
 # Run this file with specifying domain in first parameter:
@@ -19,7 +19,7 @@ fi
 # empty string
 if [ -z "$DOM" ]; then
 	echo "ERROR: Domain not set"
-	return 0
+	exit 0
 fi
 
 SUBJ="/C=US/ST=USA/L=USA/O=Local Sites-DEV/OU=Local Sites-DEV"
