@@ -1,5 +1,5 @@
 #!/bin/bash
-# ver 0.8
+# ver 1.0
 
 #
 # Run this file with specifying domain in first parameter:
@@ -23,7 +23,8 @@ if [ -z "$DOM" ]; then
 fi
 
 SUBJ="/C=US/ST=USA/L=USA/O=Local Sites-DEV/OU=Local Sites-DEV"
-THEDIR=$( dirname "$0" )
+THEDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
 
 ### Create ROOT CA certificate
 
