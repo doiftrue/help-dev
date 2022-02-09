@@ -1,15 +1,22 @@
 #!/bin/bash
 
+# This is an example of DB bump script for WordPress site.
+# It uses WP-CLI to import DB dump to local machine.
+#
+# Alog with DB dump, at the bottom you can see rsync command for coping entire
+# uploads folder from remote server to your local computer.
+#
+#
+#
+
 DOM='yoursite.ru'
 LOCAL_DOM='yoursite.dev'
-
 # site document root dir path
 LOCAL_DIR="$HOME/sites/$LOCAL_DOM/public_html"
 # dir on the remove server relative to login dir
 REMOTE_DIR="$DOM/public_html"
 # full path to the dir where collect bumps
-DUMP_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-
+DUMP_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"/RU
 
 cd "$LOCAL_DIR" || exit
 
@@ -30,6 +37,7 @@ gzip -d dump.sql.gz
 wp db import dump.sql
 wp search-replace $DOM $LOCAL_DOM
 rm dump.sql
+wp cache flush
 
 # copy uploads from remote
-rsync -avzhe ssh beget:$REMOTE_DIR/wp-content/uploads wp-content
+rsync -avzhe ssh --delete beget:$REMOTE_DIR/wp-content/uploads wp-content
