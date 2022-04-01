@@ -3,7 +3,7 @@
 # This is an example of DB bump script for WordPress site.
 # It uses WP-CLI to import DB dump to local machine.
 #
-# Alog with DB dump, at the bottom you can see rsync command for coping entire
+# Along with DB dump, at the bottom you can see rsync command for coping entire
 # uploads folder from remote server to your local computer.
 #
 #
