@@ -14,7 +14,7 @@
 ####
 
 if [ $# -lt 2 ] ; then
-  echo "USAGE $0 {DUMP_FILE} {TABLE_NAME}"
+  echo "Wrong usage. Correct is: $ bash extract-table-from-dump.sh {dumpfile.sql} {table_name_to_extract}"
   exit
 fi
 
