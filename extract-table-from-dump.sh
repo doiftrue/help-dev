@@ -14,11 +14,11 @@
 ####
 
 if [ $# -lt 2 ] ; then
-  echo "USAGE $0 {DUMP_FILE} {TABLE_NAME}"
+  echo "Wrong usage. Correct is: $ bash extract-table-from-dump.sh {dumpfile.sql} {table_name_to_extract}"
   exit
 fi
 
-CURRENT_FILE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+# CURRENT_FILE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 DUMP_FILE="$1"
 DEST_FILE="${DUMP_FILE%.sql}--$2.sql"
 
