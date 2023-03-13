@@ -12,13 +12,13 @@
 # Allowed params:
 # 1) comma-separated tables names to import into local table (if set then dump file will not be saved to 'dump' folder).
 
-REMOTE_DOM='dev.holder.io'
-LOCAL_DOM='holder.loc'
+REMOTE_DOM='dev.example.io'
+LOCAL_DOM='example.loc'
 
-SSH_ID='holder'
+SSH_ID='example'
 
 # remote site root dir - relative to ~/ (login user dir)
-REMOTE_DIR="web/www/$REMOTE_DOM/www"  # holder
+REMOTE_DIR="web/www/$REMOTE_DOM/www"  # example
 #REMOTE_DIR="$REMOTE_DOM/www"         # beget
 
 # local site root dir
