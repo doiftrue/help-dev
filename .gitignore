@@ -1,0 +1,6 @@
+.idea
+.VS_code
+
+# local-proxy
+.env
+/local-proxy/nginx/_sites.conf
