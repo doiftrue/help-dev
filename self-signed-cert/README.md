@@ -1,23 +1,47 @@
+Required packeges
+-----------------
+
+`openssl` packege must be installed for this script works. Instalation example for ubuntu:
+
+	sudo apt update
+	sudo apt install openssl -y
+	openssl version
+
+
 Usage
 -----
 
 1. Place file `create-self-signed-cert.sh` to any directory on your computer and run it. 
-2. You will be asked: the domain name (the cert creates for) and the sertificate will be created. Additionally, for the first run the base-ROOT-CA-certificates will be created to the `ROOT_CA_CERT` folder.
-This root certificate need to be added to the global trust certificates repository of your system (ubuntu), browser, etc.
+	```
+	bash ~/path/to/create-self-signed-cert.sh
+    ```
+2. Enter your local site domain name (ex. mysite.loc).
+3. Done! The self-signed certificate created for your site.
+
+Now You need to add the ROOT CA certificate to the global trust certificates repository of your system (ubuntu), browser, etc. (see bellow how to do that).
+Then, use a site related cert files: `.key`, `.crt` in yout Apache or Nginx configs.
+
 
 ### About ROOT-CA-certificate
 
-Any created certificates are signed with ROOT CA certificate (myRootCA.pem). So, to any created certificate works correctly you need to add the ROOT CA to the trust certificates repository of Ubuntu, Browser etc.
+For the script first run (once) the ROOT-CA-certificate is created to the `ROOT_CA_CERT` folder.
+
+Any further created certificates for separete site are signed with that ROOT CA certificate (myRootCA.pem).
+
+Adding the ROOT CA (myRootCA.pem) to the trust store is required to all further generated certificates works correctly.
+
 
 #### Adding ROOT-CA to Ubuntu
 
+Copy your certificate in `.pem` format (the format that has ----BEGIN CERTIFICATE---- in it) into `/usr/local/share/ca-certificates` and name it with a `.crt` file extension. Then run `sudo update-ca-certificates`.
+
 	$ sudo apt-get install -y ca-certificates
-	$ sudo cp ./ROOT_CA_CERT/myRootCA.crt /usr/local/share/ca-certificates/
+	$ sudo cp ./ROOT_CA_CERT/myRootCA.pem /usr/local/share/ca-certificates/myRootCA.pem.crt
 	$ sudo update-ca-certificates
 
-OR using interactive variant and another ubuntu CA repository (this is not recomended):
+OR using interactive variant (not recomended):
 
-	$ sudo cp ./ROOT_CA_CERT/myRootCA.crt /usr/share/ca-certificates/
+	$ sudo cp ./ROOT_CA_CERT/myRootCA.pem /usr/share/ca-certificates/myRootCA.pem.crt
 	$ sudo dpkg-reconfigure ca-certificates
 
 - See: https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/
@@ -47,12 +71,22 @@ See also: https://docs.vmware.com/en/VMware-Adapter-for-SAP-Landscape-Management
 
 ### Notes
 
-If you can't add cert to the trust repo ensure tha file has 644 chmod:
+- As an alternative for all this staff you can use `mkcert` lib: https://github.com/FiloSottile/mkcert
 
+- If you can't add cert to the trust repo ensure that file has 644 chmod:
+	```
 	sudo chmod 644 /usr/local/share/ca-certificates/myRootCA.crt
+    ```
 
-`update-ca-certificates` manual: 
-	http://manpages.ubuntu.com/manpages/trusty/man8/update-ca-certificates.8.html
+- `update-ca-certificates` manual: http://manpages.ubuntu.com/manpages/trusty/man8/update-ca-certificates.8.html
+
+- FILES:
+    ```
+    /etc/ca-certificates.conf          - A configuration file.
+    /etc/ssl/certs/ca-certificates.crt - A single-file of CA certificates. Holds all CA certificates activated in /etc/ca-certificates.conf.
+    /usr/share/ca-certificates         - Directory of CA certificates.
+    /usr/local/share/ca-certificates   - Directory of local CA certificates (with .crt extension).
+    ```
 
 Fresh updates. Remove symlinks in `/etc/ssl/certs` directory.
 

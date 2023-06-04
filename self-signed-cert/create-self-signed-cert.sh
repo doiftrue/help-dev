@@ -23,39 +23,48 @@ if [ -z "$DOM" ]; then
 fi
 
 SUBJ="/C=US/ST=USA/L=USA/O=Local Sites-DEV/OU=Local Sites-DEV"
-THEDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+THIS_FILE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
+### Create ROOT CA (root certificate authority)
 
-### Create ROOT CA certificate
-
-RCDIR="$THEDIR/ROOT_CA_CERT"
-RCNAME="myRootCA"
+CA_DIR="$THIS_FILE_DIR/ROOT_CA_CERT"
+CA_NAME="myRootCA"
 
 # skip if root ca already exists
-if [ ! -d "$RCDIR" ]; then
-	mkdir "$RCDIR"
-	openssl genrsa -out "$RCDIR/$RCNAME.key" 2048 #skip encrypt e.g. -des3 to not add pass phrase
+if [ ! -d "$CA_DIR" ]; then
+	mkdir "$CA_DIR"
+	# Note: skip `-des3` parameter to not add passphrase
+	openssl genrsa -out "$CA_DIR/$CA_NAME.key" 2048
 	# generate a root certificate
-	openssl req -x509 -new -nodes -key "$RCDIR/$RCNAME.key" -sha256 -days 7600 -out "$RCDIR/$RCNAME.pem" -subj "$SUBJ/CN=LocalCustomRootCA"
+	openssl req -x509 -new -nodes -key "$CA_DIR/$CA_NAME.key" -sha256 -days 7600 -out "$CA_DIR/$CA_NAME.pem" -subj "$SUBJ/CN=LocalCustomRootCA"
 	# convert pem to crt (this file may come in handy)
-	openssl x509 -inform PEM -outform DER -in "$RCDIR/$RCNAME.pem" -out "$RCDIR/$RCNAME.crt"
+	openssl x509 -inform PEM -outform DER -in "$CA_DIR/$CA_NAME.pem" -out "$CA_DIR/$CA_NAME.crt"
+
+	# set correct rights
+	chmod 644 "$CA_DIR/$CA_NAME.crt"
+	chmod 644 "$CA_DIR/$CA_NAME.pem"
+
+	# create copy of .pem with .crt format (it is the way to add it to ubuntu trust store with `sudo update-ca-certificates`)
+	cp "$CA_DIR/$CA_NAME.pem" "$CA_DIR/$CA_NAME.pem.crt"
 fi
 
 
-### Creating CA-Signed Certificates for Site
+### Create the site certificate and sign it with CA certificate
 
-DOMDIR="$THEDIR/$DOM"
+DOM_DIR="$THIS_FILE_DIR/$DOM"
 
-if [ -d "$DOMDIR" ]
-	then rm "$DOMDIR"/*
-	else mkdir "$DOMDIR"
+if [ -d "$DOM_DIR" ]
+	then rm "$DOM_DIR"/*
+	else mkdir "$DOM_DIR"
 fi
 
 # create certificate
-openssl genrsa -out "$DOMDIR/$DOM.key" 2048
-openssl req -new -key "$DOMDIR/$DOM.key" -out "$DOMDIR/careq.csr" -subj "$SUBJ/CN=$DOM"
 
-# sign created certificate
+openssl genrsa -out "$DOM_DIR/$DOM.key" 2048
+openssl req -new -key "$DOM_DIR/$DOM.key" -out "$DOM_DIR/careq.csr" -subj "$SUBJ/CN=$DOM"
+
+# sign certificate
+
 {
 	#echo 'nsComment="Kama Custom Generated Certificate"'
 	echo 'authorityKeyIdentifier=keyid,issuer'
@@ -65,10 +74,12 @@ openssl req -new -key "$DOMDIR/$DOM.key" -out "$DOMDIR/careq.csr" -subj "$SUBJ/C
 	echo '[alt_names]'
 	echo "DNS.1=$DOM"
 	echo "DNS.2=*.$DOM"
-} >> "$DOMDIR/$DOM.cnf"
+} >> "$DOM_DIR/$DOM.cnf"
 
-openssl x509 -req -in "$DOMDIR/careq.csr" -out "$DOMDIR/$DOM.crt" -days 3000 -sha256 -extfile "$DOMDIR/$DOM.cnf" \
--CA "$RCDIR/$RCNAME.pem" -CAkey "$RCDIR/$RCNAME.key" -CAcreateserial
+openssl x509 -req -in "$DOM_DIR/careq.csr" -out "$DOM_DIR/$DOM.crt" -days 3000 -sha256 -extfile "$DOM_DIR/$DOM.cnf" \
+-CA "$CA_DIR/$CA_NAME.pem" -CAkey "$CA_DIR/$CA_NAME.key" -CAcreateserial
 
-rm "$DOMDIR/$DOM.cnf"
-rm "$DOMDIR/careq.csr"
+# remove artifacts
+
+rm "$DOM_DIR/$DOM.cnf"
+rm "$DOM_DIR/careq.csr"
