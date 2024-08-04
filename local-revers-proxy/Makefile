@@ -15,3 +15,6 @@ d.rebuild:
 nginx.connnect:
 	docker compose exec nginx sh
 
+log.nginx:
+	docker compose logs -f nginx
+
