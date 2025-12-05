@@ -8,40 +8,40 @@ Required packeges
 	openssl version
 
 
-Usage
------
+Create self-signed certificate
+------------------------------
 
 1. Place file `create-self-signed-cert.sh` to any directory on your computer and run it. 
 	```
 	bash ~/path/to/create-self-signed-cert.sh
     ```
 2. Enter your local site domain name (ex. mysite.loc).
-3. Done! The self-signed certificate created for your site.
+3. DONE: The self-signed certificate created.
 
-Now You need to add the ROOT CA certificate to the global trust certificates repository of your system (ubuntu), browser, etc. (see bellow how to do that).
-Then, use a site related cert files: `.key`, `.crt` in yout Apache or Nginx configs.
-
-
-### About ROOT-CA-certificate
-
-For the script first run (once) the ROOT-CA-certificate is created to the `ROOT_CA_CERT` folder.
-
-Any further created certificates for separete site are signed with that ROOT CA certificate (myRootCA.pem).
-
-Adding the ROOT CA (myRootCA.pem) to the trust store is required to all further generated certificates works correctly.
+Now you need to add the ROOT CA certificate to the trust store of your system and use site related cert files in your web server configs (Apache/Nginx).
 
 
-#### Adding ROOT-CA to Ubuntu
+### Use cert files
+Add a site related cert files (`.key`, `.crt`) in yout Apache or Nginx configs.
 
-Copy your certificate in `.pem` format (the format that has ----BEGIN CERTIFICATE---- in it) into `/usr/local/share/ca-certificates` and name it with a `.crt` file extension. Then run `sudo update-ca-certificates`.
+
+Add ROOT-CA Certificate to the Trust Store
+------------------------------------------
+To make your browser/system trust the created self-signed certificate you need to add the ROOT CA certificate to the trust store of your system.
+
+
+### Add ROOT-CA to Ubuntu
+Copy `.pem.crt` certificate file (the format that has ----BEGIN CERTIFICATE---- in it) into `/usr/local/share/ca-certificates`. Then run `sudo update-ca-certificates`:
 
 	$ sudo apt-get install -y ca-certificates
-	$ sudo cp ./ROOT_CA_CERT/myRootCA.pem /usr/local/share/ca-certificates/myRootCA.pem.crt
+	$ sudo cp ./ROOT_CA_CERT/myRootCA.pem.crt /usr/local/share/ca-certificates/myRootCA.pem.crt
 	$ sudo update-ca-certificates
 
-OR using interactive variant (not recomended):
+NOTE: `.crt` file extension is important.
 
-	$ sudo cp ./ROOT_CA_CERT/myRootCA.pem /usr/share/ca-certificates/myRootCA.pem.crt
+OR use interactive variant (not recomended):
+
+	$ sudo cp ./ROOT_CA_CERT/myRootCA.pem.crt /usr/share/ca-certificates/myRootCA.pem.crt
 	$ sudo dpkg-reconfigure ca-certificates
 
 - See: https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/
@@ -49,16 +49,32 @@ OR using interactive variant (not recomended):
 - See: https://support.kerioconnect.gfi.com/hc/en-us/articles/360015200119-Adding-Trusted-Root-Certificates-to-the-Server
 
 
-#### Adding ROOT-CA to Google Chrome
+### Add ROOT-CA to Windows
+Open PowerShell as Admin and run command:
 
-1. Goto `chrome://settings/certificates` - place this string into the main Google Chrome search field. Or go to `Settings > Privacy and security > Security > Manage sertificates`.
-2. Now you need to go to `Authorities` tab and import the ROOT CA Certificate (myRootCA.crt) to the repository.
-3. Done! Now any cert you create for any site will work in Google Chrome, because it signed with ROOT-CA that is in trusted repository.
+	certutil -addstore -f "Root" C:\path\to\myRootCA.crt
 
-See also: https://support.securly.com/hc/en-us/articles/206081828-How-do-I-manually-install-the-Securly-SSL-certificate-in-Chrome-
+Now Windows will trust this CA, and all system services, Git, curl, Node, Docker Desktop, and other tools will consider certificates issued by it as valid.
+
+OR Add Manually:
+- Press `Win + R` > `certmgr.msc`.
+- In the left-tree: "Trusted Root Certification Authorities" > "Certificates."
+- Right click > All Tasks > Import > Next > Browse.
+- Select `myRootCA.crt` > Next.
+- Select "Place all certificates in the following store" > Certificate store: "Trusted Root Certification Authorities".
+- Then Next > Finish. 
+- The certificate will appear in the list.
 
 
-#### Adding ROOT-CA to Firefox
+
+### Add into Google Chrome:
+- Open `chrome://certificate-manager/localcerts/usercerts` in your browser
+- Click `Import` button in `Trusted Certificates` section and add `dev/wodbydocker/nginx/certs/ROOT_CA/bacardiRootCA.crt` file.
+
+Now any cert you create for any site will work in Google Chrome, because it signed with ROOT-CA that is in trusted repository.
+
+
+### Adding ROOT-CA to Firefox
 
 1. Goto `about:preferences#privacy` - place this string into the main Firefox search field. Or go to `Settings > Privacy and security`.
 2. Scroll down to `Security` section click `View Certificates` button and select `Authorities` tab in the appeared popup window.
@@ -69,7 +85,18 @@ See also: https://docs.vmware.com/en/VMware-Adapter-for-SAP-Landscape-Management
 
 
 
-### Notes
+About ROOT-CA Certificate
+-------------------------
+
+For the script first run (once) the ROOT-CA-certificate is created to the `ROOT_CA_CERT` folder.
+
+Any further created certificates for separete site are signed with that ROOT CA certificate (myRootCA.pem).
+
+Adding the ROOT CA (myRootCA.pem) to the trust store is required to all further generated certificates works correctly.
+
+
+Notes
+-----
 
 - As an alternative for all this staff you can use `mkcert` lib: https://github.com/FiloSottile/mkcert
 
